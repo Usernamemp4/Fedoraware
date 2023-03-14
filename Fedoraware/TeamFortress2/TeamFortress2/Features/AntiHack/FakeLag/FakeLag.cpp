@@ -113,7 +113,7 @@ void CFakeLag::Unduck(const int nOldFlags){
 	if (!Vars::Misc::CL_Move::WhileUnducking.Value) { return; }
 
 	CBaseEntity* pLocal = g_EntityCache.GetLocal();
-	if (!pLocal || !pLocal->IsAlive() || pLocal->IsDucking() || !pLocal->IsPlayer()) { return; }
+	if (!pLocal || !pLocal->IsAlive() || pLocal->IsDucking() || !pLocal->IsPlayer() || !pLocal->OnSolid()) { return; }
 	if (!(nOldFlags & FL_DUCKING)) { return; }
 	// we were ducking before & are not ducking next
 	bUnducking = true; 
