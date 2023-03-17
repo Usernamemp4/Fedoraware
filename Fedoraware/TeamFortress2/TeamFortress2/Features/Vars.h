@@ -114,7 +114,7 @@ namespace Vars
 			inline CVar<int> SortMethod{ 0 }; //0 - FOV,		1 - Distance
 			inline CVar<bool> RespectFOV{ true };
 			inline CVar<int> AimMethod{ 1 }; //0 - Normal,	1 - Silent
-			inline CVar<int> AimPosition{ 3 }; // 0/head, 1/body, 2/feet, 3/auto
+			inline CVar<int> AimPosition{ 3 }; // 0/head, 1/body, 2/feet, 3/auto, 4/closest
 			inline CVar<int> VisTestPoints{ 15 }; //how many points are we allowed to vis test before we stop scanning.
 			inline CVar<int> ScanPoints{ 15 }; //how many "visible points" need to be reached before we stop searching.
 			inline CVar<float> ScanScale{ 0.95f }; // how to scale the points.
