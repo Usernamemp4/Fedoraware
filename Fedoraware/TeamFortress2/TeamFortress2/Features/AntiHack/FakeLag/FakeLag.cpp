@@ -48,7 +48,7 @@ bool CFakeLag::IsAllowed(CBaseEntity* pLocal)
 	}
 
 	// Special Cases
-	if (bPreservingBlast || bUnducking) {
+	if (bPreservingBlast || (bUnducking && pLocal->OnSolid())) {
 		return true;
 	}
 
