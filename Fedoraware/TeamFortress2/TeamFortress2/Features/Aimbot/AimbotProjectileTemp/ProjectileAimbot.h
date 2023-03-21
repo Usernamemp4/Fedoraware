@@ -30,6 +30,7 @@ struct TTargetInfo {
 
 struct TTargetRecord {
 	float flFoVTo{};
+	int iPriority{};	//	redo this someday
 	CBaseEntity* pEntity = nullptr;
 	//int iType{};
 };
