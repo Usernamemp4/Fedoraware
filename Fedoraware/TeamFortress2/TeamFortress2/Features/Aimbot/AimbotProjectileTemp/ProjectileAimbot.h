@@ -1,5 +1,6 @@
 #pragma once
 #include "../AimbotGlobal/AimbotGlobal.h"
+#include "../MovementSimulation/MovementSimulation.h"
 
 struct TWeaponInfo {
 	Vec3 vMins{};
@@ -25,6 +26,10 @@ struct TTargetInfo {
 	Vec3 vMins{};
 	Vec3 vMaxs{};
 	Vec3 vAbsOrigin{};
+	Vec3 vBackupAbsOrigin{};
+	CMoveData iMoveData{};
+	int iLastVisCheckTick{};
+	int iPredictionTicks{};
 	CBaseEntity* pEntity = nullptr;
 };
 
@@ -41,6 +46,7 @@ private:
 	TAimInfo iTarget{};
 	TTargetInfo iTargetInfo{};
 
+
 	KeyHelper kBounce{ &Vars::Aimbot::Projectile::BounceKey.Value };
 
 	//	point maths.
@@ -53,7 +59,13 @@ private:
 	void FillWeaponInfo();	//	will use G::CurWeaponIndex to fill weapon info.
 	Vec3 GetFireOffset();	//	will get the firing offset of a weapon.	(I have thought about countering the rocket correction done by the game but its pointless)
 	float GetInterpolatedStartPosOffset();		//	to make up for interp, projectiles spawn a certain distance behind your weapon
+	float GetWeaponVelocity();
+	Vec3 GetWeaponBounds();
 	bool CanTargetTeammates();
+	bool TimeMatch();
+	//	Hitbox Verification
+	bool WillPointHitBone(const Vec3 vPoint, const int nBone, CBaseEntity* pEntity);
+	int BoneFromPoint(CBaseEntity* pEntity, const Vec3 vPoint);
 	//	Arc Pred
 	void RequiredStickyCharge();	//	we should make sure that we can still target enemies with stickies while respecting the max height the sticky can reach, increasing the velocity will reduce the arc required.
 	//	Targeting
@@ -62,11 +74,24 @@ private:
 	int GetHitbox();
 	bool ShouldBounce();
 	int GetTargetIndex();
+	bool ShouldTargetThisTick();
 	//	Ray Tracing Automatic
 	bool CanSeePoint();
 	bool BoxTraceEnd();
+	bool IsTargetVisible();
+	//	Ray Tracing Manual
+	bool IsEntityVisible(CBaseEntity* pEntity);
+	bool IsEntityVisibleFromPoint(CBaseEntity* pEntity, const Vec3 vPoint);
+	bool IsPointVisible(const Vec3 vPoint);
+	bool IsPointVisibleFromPoint(const Vec3 vPoint, const Vec3 vFromPoint);
 
 	//	Prediction
+	//	Projectile Prediction
 	void PredictProjectileTick();	//	ideally if I add this it will be done differently.
+	//	Target Prediction
+	bool DoesTargetNeedPrediction();
+	bool BeginTargetPrediction();
+	void RunPrediction();
+	void EndTargetPrediction();
 public:
 };
