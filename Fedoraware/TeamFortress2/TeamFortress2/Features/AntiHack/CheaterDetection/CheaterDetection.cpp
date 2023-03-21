@@ -7,7 +7,7 @@ bool CCheaterDetection::ShouldScan()
 
 	if (I::EngineClient->IsPlayingTimeDemo()) { return false; }
 
-	if (!Vars::Misc::CheaterDetection::Enabled.Value && !iDetectFlags) { return false; }
+	if (!Vars::Misc::CheaterDetection::Enabled.Value || !iDetectFlags) { return false; }
 
 	if (iLastScanTick == I::GlobalVars->tickcount && iProtFlags & (1 << 2)) { return false; }
 
