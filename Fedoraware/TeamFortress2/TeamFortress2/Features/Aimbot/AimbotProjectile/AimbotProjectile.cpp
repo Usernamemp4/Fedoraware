@@ -618,7 +618,7 @@ bool CAimbotProjectile::WillProjectileHit(CBaseEntity* pLocal, CBaseCombatWeapon
 			case TF_WEAPON_CROSSBOW:
 			{
 				hullSize = { 3.f, 3.f, 3.f };
-				const Vec3 vecOffset(23.5f, -8.0f, -3.0f);
+				const Vec3 vecOffset(23.5f, 8.0f, -3.0f);
 				Utils::GetProjectileFireSetup(pLocal, predictedViewAngles, vecOffset, &vVisCheck);
 				break;
 			}
@@ -653,7 +653,7 @@ bool CAimbotProjectile::WillProjectileHit(CBaseEntity* pLocal, CBaseCombatWeapon
 			{
 				hullSize = { 1.f, 1.f, 1.f };	//	tf_projectile_arrow.cpp @L271
 
-				const Vec3 vecOffset(23.5f, 12.0f, -3.0f); //tf_weapon_grapplinghook.cpp @L355 ??
+				const Vec3 vecOffset(23.5f, 8.0f, -3.0f); //tf_weapon_grapplinghook.cpp @L355 ??
 				Utils::GetProjectileFireSetup(pLocal, predictedViewAngles, vecOffset, &vVisCheck);
 				break;
 			}
@@ -661,7 +661,7 @@ bool CAimbotProjectile::WillProjectileHit(CBaseEntity* pLocal, CBaseCombatWeapon
 			case TF_WEAPON_DRG_POMSON:
 			{
 				hullSize = { 1.f, 1.f, 1.f };
-				Vec3 vecOffset(23.5f, -8.0f, -3.0f); //tf_weaponbase_gun.cpp @L568
+				Vec3 vecOffset(23.5f, 12.0f, -3.0f); //tf_weaponbase_gun.cpp @L568
 				if (pLocal->IsDucking())
 				{
 					vecOffset.z = 8.0f;
