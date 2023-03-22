@@ -23,6 +23,7 @@ struct TAimInfo {
 	Vec3 vAngles{};	//	this will be our angles while we are facing the target
 	Vec3 vShootPos{};	//not sure whether to use offset position or not for closest aimbot setting.
 	Vec3 vShootOffset{};
+	float flTime{};
 	CBaseEntity* pEntity = nullptr;
 };
 
@@ -62,6 +63,7 @@ private:
 	//	Info
 	void FillWeaponInfo();	//	will use G::CurWeaponIndex to fill weapon info.
 	Vec3 GetFireOffset();	//	will get the firing offset of a weapon.	(I have thought about countering the rocket correction done by the game but its pointless)
+	Vec3 GetFirePos();
 	float GetInterpolatedStartPosOffset();		//	to make up for interp, projectiles spawn a certain distance behind your weapon
 	float GetWeaponVelocity();
 	Vec3 GetWeaponBounds();
@@ -79,6 +81,7 @@ private:
 	bool ShouldBounce();
 	int GetTargetIndex();
 	bool ShouldTargetThisTick();
+	bool EstimateProjectileAngle();
 	//	Ray Tracing Automatic
 	bool CanSeePoint();
 	bool BoxTraceEnd();

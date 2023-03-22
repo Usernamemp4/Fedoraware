@@ -108,16 +108,25 @@ Vec3 CProjectileAimbot::GetFireOffset() {
 	}
 	}
 
-	if (GetInterpolatedStartPosOffset() > 0.f) {
-		const Vec3 vTempOffset = { vOffset.x, vOffset.y, vOffset.z - GetInterpolatedStartPosOffset() };
-		CGameTrace trace = {};
-		CTraceFilterHitscan filter = {};
-		filter.pSkip = pSkip;
-		Utils::Trace(vOffset, vTempOffset, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
-		vOffset = trace.vEndPos;
-	}
-
 	return vOffset;
+}
+
+Vec3 CProjectileAimbot::GetFirePos() {
+	CBaseEntity* pLocal = g_EntityCache.GetLocal();
+	Vec3 vFiringPos = pLocal->GetShootPos();
+	const Vec3 vOffset = GetFireOffset();
+
+	Utils::GetProjectileFireSetup(pLocal, iTarget.vAngles, vOffset, &vFiringPos);
+
+	//if (GetInterpolatedStartPosOffset() > 0.f) {
+	//	const Vec3 vTempOffset = { vFiringPos.x, vFiringPos.y, vFiringPos.z - GetInterpolatedStartPosOffset() };
+	//	CGameTrace trace = {};
+	//	CTraceFilterHitscan filter = {};
+	//	filter.pSkip = g_EntityCache.GetLocal();
+	//	Utils::Trace(vOffset, vTempOffset, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
+	//	vOffset = trace.vEndPos;
+	//}
+	return vFiringPos;
 }
 
 float CProjectileAimbot::GetInterpolatedStartPosOffset()
@@ -148,6 +157,34 @@ __inline void CProjectileAimbot::EndTargetPrediction() {
 bool CProjectileAimbot::WillPointHitBone(const Vec3 vPoint, const int nBone, CBaseEntity* pEntity) {
 	if (BoneFromPoint(pEntity, vPoint) != nBone) { return false; }
 	if (!IsPointVisibleFromPoint(pEntity->GetBonePos(nBone), vPoint)) { return false; }
+	return true;
+}
+
+bool CProjectileAimbot::EstimateProjectileAngle() {
+	const float flGravity = g_ConVars.sv_gravity->GetFloat() * iWeapon.flGravity;
+	const Vec3 vDelta = iTarget.vShootPos - iWeapon.vInitialLocation;
+	const float flHyp = sqrt(vDelta.x * vDelta.x + vDelta.y * vDelta.y);
+	const float flDist = vDelta.z;
+	const float flVel = iWeapon.flInitialVelocity;
+
+	if (!flGravity)
+	{
+		const Vec3 vAngleTo = Math::CalcAngle(iWeapon.vInitialLocation, iTarget.vShootPos);
+		iTarget.vAngles.x = -DEG2RAD(vAngleTo.x);
+		iTarget.vAngles.y = DEG2RAD(vAngleTo.y);
+	}
+	else
+	{	//	arch
+		const float flRoot = pow(flVel, 4) - flGravity * (flGravity * pow(flHyp, 2) + 2.f * flDist * pow(flVel, 2));
+		if (flRoot < 0.f)
+		{
+			return false;
+		}
+		iTarget.vAngles.x = atan((pow(flVel, 2) - sqrt(flRoot)) / (flGravity * flHyp));
+		iTarget.vAngles.y = atan2(vDelta.y, vDelta.x);
+	}
+	iTarget.flTime = flHyp / (cos(iTarget.vAngles.x) * flVel);
+
 	return true;
 }
 
