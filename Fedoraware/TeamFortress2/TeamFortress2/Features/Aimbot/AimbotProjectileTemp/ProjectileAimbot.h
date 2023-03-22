@@ -2,6 +2,10 @@
 #include "../AimbotGlobal/AimbotGlobal.h"
 #include "../MovementSimulation/MovementSimulation.h"
 
+/// Credits;
+/// - spook935 for vphysics projectile simulation
+/// - emilyinure for projectile speed & firing offsets
+
 struct TWeaponInfo {
 	Vec3 vMins{};
 	Vec3 vMaxs{};	//	vMaxs and vMins will be identical aside from the sign.
@@ -84,6 +88,7 @@ private:
 	bool IsEntityVisibleFromPoint(CBaseEntity* pEntity, const Vec3 vPoint);
 	bool IsPointVisible(const Vec3 vPoint);
 	bool IsPointVisibleFromPoint(const Vec3 vPoint, const Vec3 vFromPoint);
+	bool HullVisibility(const Vec3 vPoint, const Vec3 vFromPoint, const Vec3 vHullSize);
 
 	//	Prediction
 	//	Projectile Prediction

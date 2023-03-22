@@ -29,26 +29,118 @@ void CProjectileAimbot::FillWeaponInfo() {
 	iWeapon.vMaxs = GetWeaponBounds(); iWeapon.vMins = iWeapon.vMaxs * -1.f;
 }
 
+float CProjectileAimbot::GetWeaponVelocity() {
+	CBaseEntity* pLocal = g_EntityCache.GetLocal();
+	const bool bRune = pLocal->IsPrecisionRune();
+
+	switch (iWeapon.pWeapon->GetWeaponID()) {
+	case TF_WEAPON_ROCKETLAUNCHER:
+	case TF_WEAPON_ROCKETLAUNCHER_DIRECTHIT:
+	case TF_WEAPON_PARTICLE_CANNON:
+	{
+		return (bRune ? 2.5f : 1.f) * Utils::ATTRIB_HOOK_FLOAT(1100, "mult_projectile_speed", iWeapon.pWeapon, 0, 1);
+	}
+	case TF_WEAPON_GRENADELAUNCHER:
+	case TF_WEAPON_CANNON:
+	{
+		return (bRune ? 2.5f : 1.f) * Utils::ATTRIB_HOOK_FLOAT(1200, "mult_projectile_speed", iWeapon.pWeapon, 0, 1);
+	}
+	case TF_WEAPON_FLAMETHROWER:
+	case TF_WEAPON_SYRINGEGUN_MEDIC:
+	{
+		return 1000.f;
+	}
+	case TF_WEAPON_SHOTGUN_BUILDING_RESCUE:
+	case TF_WEAPON_CROSSBOW:
+	{
+		return 2400.f;
+	}
+	case TF_WEAPON_RAYGUN:
+	{
+		return 1200.f;
+	}
+	case TF_WEAPON_FLAREGUN:
+	{
+		return 2000.f;
+	}
+	case TF_WEAPON_FLAME_BALL:
+	case TF_WEAPON_RAYGUN_REVENGE:
+	case TF_WEAPON_CLEAVER:
+	{
+		return 3000.f
+	}
+	case TF_WEAPON_COMPOUND_BOW:
+	{
+		if (iWeapon.pWeapon->GetChargeBeginTime() == 0.f) { return 1800.f; }
+		return Math::RemapValClamped(TICKS_TO_TIME(pLocal->m_nTickBase()) - iWeapon.pWeapon->GetChargeBeginTime(), 0.0f, 1.f, 1800.f, 2600.f);
+	}
+	case TF_WEAPON_PIPEBOMBLAUNCHER:
+	{
+		if (iWeapon.pWeapon->GetChargeBeginTime() == 0.f) { return 900.f; }
+		return Math::RemapValClamped(TICKS_TO_TIME(pLocal->m_nTickBase()) - iWeapon.pWeapon->GetChargeBeginTime(), 0.0f, G::CurItemDefIndex == Demoman_s_TheQuickiebombLauncher ? 1.2f : 4.f, 900.f, 2400.f);
+	}
+	}
+
+	return 0.f;
+}
+
+Vec3 CProjectileAimbot::GetFireOffset() {
+	Vec3 vOffset{ 23.5f, 12.0f, -3.0f };
+	switch (iWeapon.pWeapon->GetWeaponID()) {
+	case TF_WEAPON_CROSSBOW:
+	case TF_WEAPON_COMPOUND_BOW:
+	case TF_WEAPON_SHOTGUN_BUILDING_RESCUE:
+	{
+		vOffset = { 23.5f, 8.0f, -3.0f };
+		break;
+	}
+	case TF_WEAPON_GRENADELAUNCHER:
+	case TF_WEAPON_PIPEBOMBLAUNCHER:
+	case TF_WEAPON_STICKBOMB:
+	case TF_WEAPON_STICKY_BALL_LAUNCHER:
+	{
+		vOffset = { 16.0f, 8.0f, -6.0f };
+		break;
+	}
+	case TF_WEAPON_SYRINGEGUN_MEDIC: {
+		vOffset = { 16.0f, 6.0f, -8.0f };
+		break;
+	}
+	}
+
+	if (GetInterpolatedStartPosOffset() > 0.f) {
+		const Vec3 vTempOffset = { vOffset.x, vOffset.y, vOffset.z - GetInterpolatedStartPosOffset() };
+		CGameTrace trace = {};
+		CTraceFilterHitscan filter = {};
+		filter.pSkip = pSkip;
+		Utils::Trace(vOffset, vTempOffset, (MASK_SHOT | CONTENTS_GRATE), &filter, &trace);
+		vOffset = trace.vEndPos;
+	}
+
+	return vOffset;
+}
+
 float CProjectileAimbot::GetInterpolatedStartPosOffset()
 {
 	return G::LerpTime * iWeapon.flInitialVelocity;
 }
 
-bool CProjectileAimbot::DoesTargetNeedPrediction() {
+__inline bool CProjectileAimbot::DoesTargetNeedPrediction() {
 	return iTargetInfo.pEntity->GetVelocity().Length() > 0;	//	buildings can't move so this shouldn't predict buildings :troller:
 }
 
-bool CProjectileAimbot::BeginTargetPrediction() {
+__inline bool CProjectileAimbot::BeginTargetPrediction() {
 	iTargetInfo.vBackupAbsOrigin = iTargetInfo.pEntity->GetAbsOrigin();
 	return F::MoveSim.Initialize(iTargetInfo.pEntity);
 }
 
-void CProjectileAimbot::RunPrediction() {
+__inline void CProjectileAimbot::RunPrediction() {
 	F::MoveSim.RunTick(iTargetInfo.iMoveData, iTargetInfo.vAbsOrigin);
 	iTargetInfo.pEntity->SetAbsOrigin(iTargetInfo.vAbsOrigin);
+	iTarget.vShootPos = iTargetInfo.vAbsOrigin + iTarget.vShootOffset;
 }
 
-void CProjectileAimbot::EndTargetPrediction() {
+__inline void CProjectileAimbot::EndTargetPrediction() {
 	F::MoveSim.Restore();
 	iTargetInfo.pEntity->SetAbsOrigin(iTargetInfo.vBackupAbsOrigin);
 }
@@ -74,9 +166,12 @@ int CProjectileAimbot::BoneFromPoint(const Vec3 vPoint, CBaseEntity* pEntity) {
 }
 
 int CProjectileAimbot::GetTargetIndex() {
+	vTargetRecords.clear();
 	CBaseEntity* pLocal = g_EntityCache.GetLocal();
 	const Vec3 vAngles = pLocal->GetEyeAngles();
 	const Vec3 vEyePos = pLocal->GetEyePosition();
+
+	const std::vector<CBaseEntity*> vNonPlayers = g_EntityCache.GetGroup(EGroupType::BUILDINGS_ENEMIES) + g_EntityCache.GetGroup(EGroupType::WORLD_NPC);
 
 	for (CBaseEntity* CTFPlayer : g_EntityCache.GetGroup(CanTargetTeammates() ? EGroupType::PLAYERS_ALL : EGroupType::PLAYERS_ENEMIES)) {
 		//	Lets do an FoV check first.
@@ -99,17 +194,94 @@ int CProjectileAimbot::GetTargetIndex() {
 			continue;
 		}
 
+		vTargetRecords.push_back({ flFoVTo, F::AimbotGlobal.GetPriority(CTFPlayer->GetIndex()), CTFPlayer });
+	}
 
+	for (CBaseEntity* pEntity : vNonPlayers) {
+		const Vec3 vBonePos = pEntity->GetHitboxPos(0);
+		const Vec3 vAngTo = Math::CalcAngle(vEyePos, vBonePos);
+		const float flFoVTo = Math::CalcFov(vAngles, vAngTo)
+		if (flFoVTo < 0) { continue; }
+
+		vTargetRecords.push_back({ flFoVTo, 0, pEntity});
 	}
 }
 
 //	Scans points and returns the most appropriate one.
-Vec3 CProjectileAimbot::GetPoint(const int nHitbox)
+Vec3 CProjectileAimbot::GetPoint(const int nHitbox = -1)
 {
-	CBaseEntity* pLocal = g_EntityCache.GetLocal();
-	const Vec3 vMaxs = iTargetInfo.vMaxs;
-	const Vec3 vMins = iTargetInfo.vMins;
-	const Vec3 vBase = iTargetInfo.vAbsOrigin;
+	constexpr float& flMult = Vars::Aimbot::Projectile::ScanScale.Value;
+	const Vec3 vMaxs = iTargetInfo.vMaxs * flMult;
+	const Vec3 vMins = iTargetInfo.vMins * flMult;
+	const Vec3 vPos = iTargetInfo.vAbsOrigin;
+
+	if (nHitbox >= 0) {
+		return iTargetInfo.pEntity->GetBonePos(nHitbox);	//	there is no point in vischecking this as we only ever want to target this hitbox.
+	}
+
+	constexpr std::vector<Vec3> vPoints{
+		//	top 4 points
+		{vMaxs.x, vMaxs.y, vMaxs.z},
+		{vMins.x, vMaxs.y, vMaxs.z},
+		{vMins.x, vMaxs.y, vMins.z},
+		{vMaxs.x, vMaxs.y, vMins.z},
+		//	bottom 4 points		
+		{vMaxs.x, vMins.y, vMaxs.z},
+		{vMins.x, vMins.y, vMaxs.z},
+		{vMins.x, vMins.y, vMins.z},
+		{vMaxs.x, vMins.y, vMins.z},
+	};
+
+	const matrix3x4 vTransform = {
+		{1.f, 0, 0, vPos.x},
+		{0, 1.f, 0, vPos.y},
+		{0, 0, 1.f, iTargetInfo.pEntity->GetVecVelocity().IsZero() ? iTargetInfo.vBackupAbsOrigin.z : vPos.z}
+	};
+
+	for (Vec3 vPoint : vPoints) {
+		Vec3 vTransformedPoint{};
+		Math::VectorTransform(vPoint, vTransform, vTransformedPoint);
+		if (!IsPointVisibleFromPoint(vTransformedPoint, iWeapon.vInitialLocation)) { continue; }
+		if (!HullVisibility(vTransformedPoint, iWeapon.vInitialLocation, iWeapon.vMaxs)) { continue; }
+		return vTransformedPoint;
+	}
+
+	//	we have failed to get a point, return the abs origin as visibility will be checked later
+	return iTargetInfo.vAbsOrigin;
+}
+
+bool CProjectileAimbot::IsTargetVisible() {
+	constexpr float& flMult = Vars::Aimbot::Projectile::ScanScale.Value;
+	const Vec3 vMaxs = iTargetInfo.vMaxs * flMult;
+	const Vec3 vMins = iTargetInfo.vMins * flMult;
+	const Vec3 vPos = iTargetInfo.vAbsOrigin;
+
+	constexpr std::vector<Vec3> vPoints{
+		//	top 4 points
+		{vMaxs.x, vMaxs.y, vMaxs.z},
+		{vMins.x, vMaxs.y, vMaxs.z},
+		{vMins.x, vMaxs.y, vMins.z},
+		{vMaxs.x, vMaxs.y, vMins.z},
+		//	bottom 4 points		
+		{vMaxs.x, vMins.y, vMaxs.z},
+		{vMins.x, vMins.y, vMaxs.z},
+		{vMins.x, vMins.y, vMins.z},
+		{vMaxs.x, vMins.y, vMins.z},
+	};
+
+	const matrix3x4 vTransform = {
+		{1.f, 0, 0, vPos.x},
+		{0, 1.f, 0, vPos.y},
+		{0, 0, 1.f, iTargetInfo.pEntity->GetVecVelocity().IsZero() ? iTargetInfo.vBackupAbsOrigin.z : vPos.z}
+	};
+
+	for (uint16 iCurPoint = 0; iCurPoint < vPoints.size(); iCurPoint += 2) {
+		Vec3 vTransformedPoint{};
+		if (!IsPointVisibleFromPoint(vTransformedPoint, iWeapon.vInitialLocation)) { continue; }
+		return true;
+	}
+
+	return false;
 }
 
 int CProjectileAimbot::GetHitbox()	//	only for bone aimbot!!!
