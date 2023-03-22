@@ -3,7 +3,7 @@
 #include "../MovementSimulation/MovementSimulation.h"
 
 /// Credits;
-/// - spook935 for vphysics projectile simulation
+/// - spook953 for vphysics projectile simulation
 /// - emilyinure for projectile speed & firing offsets
 
 struct TWeaponInfo {
