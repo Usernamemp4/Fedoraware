@@ -399,3 +399,4 @@ FodyWeavers.xsd
 /Fedoraware/enc_temp_folder
 /Fedoraware/AVX2
 Fedoraware/TeamFortress2/TeamFortress2.vcxproj.user
+*.recipe
