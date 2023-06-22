@@ -21,6 +21,7 @@ void CMisc::RunPre(CUserCmd* pCmd, bool* pSendPacket)
 		//PrintProjAngles(pLocal);
 		AccurateMovement(pCmd, pLocal);
 		FastAccel(pCmd, pLocal, pSendPacket);
+		AutoJump(pCmd, pLocal);
 		AutoStrafe(pCmd, pLocal);
 		NoiseMakerSpam(pLocal);
 		ExtendFreeze(pLocal);
@@ -44,7 +45,6 @@ void CMisc::RunMid(CUserCmd* pCmd, const int nOldGroundEnt)
 {
 	if (const auto& pLocal = g_EntityCache.GetLocal())
 	{
-		AutoJump(pCmd, pLocal);
 		EdgeJump(pLocal, pCmd, nOldGroundEnt);
 		DuckJump(pLocal, pCmd);
 	}
@@ -596,7 +596,7 @@ void CMisc::AutoJump(CUserCmd* pCmd, CBaseEntity* pLocal)
 		return;
 	}
 
-	const bool bJumpHeld = G::LastUserCmd->buttons & IN_JUMP;
+	const bool bJumpHeld = pCmd->buttons & IN_JUMP;
 	const bool bCurHop = bJumpHeld && pLocal->OnSolid();
 	static bool bHopping = bCurHop;
 	static bool bTried = false;
