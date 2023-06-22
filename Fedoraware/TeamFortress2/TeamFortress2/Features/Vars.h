@@ -64,18 +64,18 @@ namespace Vars
 		namespace Global
 		{
 			inline CVar<bool> Active{ false };
-			inline CVar<int> AimKey{ VK_XBUTTON1 };
-			inline CVar<float> AimFOV{ 15.0f };
-			inline CVar<bool> AutoShoot{ false };
-			inline CVar<bool> DontWaitForShot{ false };
+			inline CVar<int> AimKey{ VK_LSHIFT };
+			inline CVar<float> AimFOV{ 30.0f };
+			inline CVar<bool> AutoShoot{ true };
+			inline CVar<bool> DontWaitForShot{ true };
 			inline CVar<bool> FlickatEnemies{ false };
 			inline CVar<bool> AimPlayers{ true };
-			inline CVar<bool> AimBuildings{ false };
-			inline CVar<bool> AimStickies{ false };
-			inline CVar<bool> AimNPC{ false };
-			inline CVar<bool> AimBombs{ false };
-			inline CVar<int> IgnoreOptions{ 0b0000000 }; //disguised, fakelagging players, vaccinator, taunting, friends, deadringer,cloaked, invul
-			inline CVar<int> TickTolerance{ 7 };
+			inline CVar<bool> AimBuildings{ true };
+			inline CVar<bool> AimStickies{ true };
+			inline CVar<bool> AimNPC{ true };
+			inline CVar<bool> AimBombs{ true };
+			inline CVar<int> IgnoreOptions{ 0b01001111 }; //disguised, fakelagging players, vaccinator, taunting, friends, deadringer,cloaked, invul
+			inline CVar<int> TickTolerance{ 14 };
 			inline CVar<bool> BAimLethal{ false }; // This is in global cause i remmebered hunterman exists
 			inline CVar<bool> showHitboxes{ false }; // original codenz
 			inline CVar<bool> ClearPreviousHitbox{ false };
@@ -91,21 +91,21 @@ namespace Vars
 			inline CVar<bool> RespectFOV{ true };
 			inline CVar<int> AimMethod{ 2 }; //0 - Normal,	1 - Smooth, 2 - Silent
 			inline CVar<int> AimHitbox{ 2 }; //0 - Head,		1 - Body,	2 - Auto
-			inline CVar<int> ScanHitboxes{ 0b00111 }; // {legs, arms, body, pelvis, head}
-			inline CVar<int> MultiHitboxes{ 0b00101 }; // {legs, arms, body, pelvis, head}
+			inline CVar<int> ScanHitboxes{ 0b11111 }; // {legs, arms, body, pelvis, head}
+			inline CVar<int> MultiHitboxes{ 0b00111 }; // {legs, arms, body, pelvis, head}
 			inline CVar<int> StaticHitboxes{ 0b11000 }; // {legs, arms, body, pelvis, head}
-			inline CVar<float> PointScale{ .54f };
+			inline CVar<float> PointScale{ .62f };
 			inline CVar<int> SmoothingAmount{ 4 };
-			inline CVar<int> TapFire{ 0 }; //0 - Off, 1 - Distance, 2 - Always
-			inline CVar<float> TapFireDist{ 1000.f };
-			inline CVar<bool> ScanBuildings{ false };
+			inline CVar<int> TapFire{ 1 }; //0 - Off, 1 - Distance, 2 - Always
+			inline CVar<float> TapFireDist{ 1024.f };
+			inline CVar<bool> ScanBuildings{ true };
 			inline CVar<bool> WaitForHeadshot{ false };
 			inline CVar<bool> WaitForCharge{ false };
 			inline CVar<bool> SpectatedSmooth{ false };
 			inline CVar<bool> ScopedOnly{ false };
 			inline CVar<bool> AutoScope{ false };
 			inline CVar<bool> AutoRev{ false };
-			inline CVar<bool>ExtinguishTeam{ false };
+			inline CVar<bool> ExtinguishTeam{ false };
 		}
 
 		namespace Projectile
@@ -117,21 +117,21 @@ namespace Vars
 			inline CVar<int> AimPosition{ 3 }; // 0/head, 1/body, 2/feet, 3/auto, 4/closest
 			inline CVar<int> VisTestPoints{ 15 }; //how many points are we allowed to vis test before we stop scanning.
 			inline CVar<int> ScanPoints{ 15 }; //how many "visible points" need to be reached before we stop searching.
-			inline CVar<float> ScanScale{ 0.95f }; // how to scale the points.
-			inline CVar<int> AllowedHitboxes{ 0b000 }; // 111, Feet, Body, Head.
-			inline CVar<bool> FeetAimIfOnGround{ false };
+			inline CVar<float> ScanScale{ 0.98f }; // how to scale the points.
+			inline CVar<int> AllowedHitboxes{ 0b111 }; // 111, Feet, Body, Head.
+			inline CVar<bool> FeetAimIfOnGround{ true };
 			inline CVar<int> BounceKey{ 0x0 };
 			inline CVar<bool> SplashPrediction{ false };
 			inline CVar<int> MinSplashPredictionDistance{ 0 };
 			inline CVar<int> MaxSplashPredictionDistance{ 10000 };
 			inline Color_t PredictionColor{ 0, 255, 0, 255 };
-			inline CVar<float> PredictionTime{ 2.0f };
+			inline CVar<float> PredictionTime{ 10.0f };
 			inline CVar<bool> PredictObscured{ false };
 			inline CVar<bool> NoSpread{ false };
 			inline CVar<bool> ChargeLooseCannon{ false };
 			inline CVar<bool> StrafePredictionGround{ false };
-			inline CVar<bool> StrafePredictionAir{ false };
-			inline CVar<int> StrafePredictionSamples{ 10 };
+			inline CVar<bool> StrafePredictionAir{ true };
+			inline CVar<int> StrafePredictionSamples{ 3 };
 			inline CVar<int> StrafePredictionMaxDistance{ 1000 };
 			inline CVar<int> StrafePredictionMinDifference{ 10 };
 			inline CVar<bool> WaitForHit{ false };
@@ -144,9 +144,9 @@ namespace Vars
 			inline CVar<bool> RespectFOV{ false };
 			inline CVar<int> AimMethod{ 2 }; //0 - Normal,	1 - Smooth, 2 - Silent
 			inline CVar<int> SmoothingAmount{ 8 };
-			inline CVar<bool> RangeCheck{ false };
-			inline CVar<bool> PredictSwing{ false };
-			inline CVar<bool> WhipTeam{ false };
+			inline CVar<bool> RangeCheck{ true };
+			inline CVar<bool> PredictSwing{ true };
+			inline CVar<bool> WhipTeam{ true };
 		}
 	}
 
@@ -154,9 +154,9 @@ namespace Vars
 	{
 		namespace Global
 		{
-			inline CVar<bool> Active{ false };
-			inline CVar<int> TriggerKey{ VK_XBUTTON2 };
-			inline CVar<int> IgnoreOptions{ 0b00000 }; //disguised, fakelagging players, taunting, friends, cloaked, invul
+			inline CVar<bool> Active{ true };
+			inline CVar<int> TriggerKey{ 0x0 };
+			inline CVar<int> IgnoreOptions{ 0b010111 }; //disguised, fakelagging players, taunting, friends, cloaked, invul
 		}
 
 		namespace Shoot
@@ -182,11 +182,11 @@ namespace Vars
 
 		namespace Detonate
 		{
-			inline CVar<bool> Active{ false };
-			inline CVar<int> DetonateTargets{ 0b00001 };
-			inline CVar<bool> Stickies{ false };
-			inline CVar<bool> Flares{ false };
-			inline CVar<float> RadiusScale{ 1.0f };
+			inline CVar<bool> Active{ true };
+			inline CVar<int> DetonateTargets{ 0b11101 };
+			inline CVar<bool> Stickies{ true };
+			inline CVar<bool> Flares{ true };
+			inline CVar<float> RadiusScale{ 0.98f };
 		}
 
 		namespace Blast
@@ -316,14 +316,14 @@ namespace Vars
 	{
 		namespace Main
 		{
-			inline CVar<bool> Active{ false };
+			inline CVar<bool> Active{ true };
 		}
 
 		namespace Players
 		{
-			inline CVar<bool> Active{ false };
-			inline CVar<bool> Wearables{ false };
-			inline CVar<bool> Weapons{ false };
+			inline CVar<bool> Active{ true };
+			inline CVar<bool> Wearables{ true };
+			inline CVar<bool> Weapons{ true };
 			inline CVar<bool> FadeoutTeammates{ false };
 			inline CVar<bool> EnemyOnly{ true };
 
@@ -345,15 +345,15 @@ namespace Vars
 			inline Chams_t Team{};
 			inline Chams_t Target{};
 
-			inline CVar<bool> Active{ false };
+			inline CVar<bool> Active{ true };
 			inline CVar<int> Material{ 3 }; //0 - None, 1 - Shaded, 2 - Shiny, 3 - Flat
 			inline CVar<bool> IgnoreZ{ false };
-			inline CVar<bool> EnemyOnly{ true };
+			inline CVar<bool> EnemyOnly{ false };
 		}
 
 		namespace World
 		{
-			inline CVar<bool> Active{ false };
+			inline CVar<bool> Active{ true };
 			inline CVar<int> Projectilez{ 2 };
 			inline Chams_t Health{};
 			inline Chams_t Ammo{};
@@ -369,8 +369,6 @@ namespace Vars
 
 		namespace DME
 		{
-			inline CVar<bool> Active{ false };
-
 			inline Chams_t Hands{ 1, 0, 0, true };
 			inline Chams_t Weapon{ 1, 0, 0, true };
 
