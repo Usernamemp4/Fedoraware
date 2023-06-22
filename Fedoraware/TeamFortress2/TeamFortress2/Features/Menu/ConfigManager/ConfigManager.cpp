@@ -450,8 +450,8 @@ bool CConfigManager::SaveConfig(const std::string& configName)
 
 		//Misc
 		{
+			SAVE_VAR(Vars::Misc::AltMovement);
 			SAVE_VAR(Vars::Misc::ScoreboardPlayerlist);
-			SAVE_VAR(Vars::Misc::FastDeltaStrafe);
 			SAVE_VAR(Vars::Misc::AccurateMovement);
 			SAVE_VAR(Vars::Misc::InfiniteEatKey);
 			SAVE_VAR(Vars::Misc::DirectionalOnlyOnMove);
@@ -493,9 +493,6 @@ bool CConfigManager::SaveConfig(const std::string& configName)
 			SAVE_VAR(Vars::Misc::PartyNetworking);
 			SAVE_VAR(Vars::Misc::PartyMarker);
 			SAVE_VAR(Vars::Misc::PartyESP);
-			SAVE_VAR(Vars::Misc::CrouchSpeed);
-			SAVE_VAR(Vars::Misc::FastAccel);
-			SAVE_VAR(Vars::Misc::FakeAccelAngle);
 			SAVE_VAR(Vars::Misc::SoundBlock);
 			SAVE_VAR(Vars::Misc::ChatFlags);
 			SAVE_VAR(Vars::Misc::MedievalChat);
@@ -838,8 +835,8 @@ bool CConfigManager::LoadConfig(const std::string& configName)
 
 		//Misc
 		{
+			LOAD_VAR(Vars::Misc::AltMovement);
 			LOAD_VAR(Vars::Misc::ScoreboardPlayerlist);
-			LOAD_VAR(Vars::Misc::FastDeltaStrafe);
 			LOAD_VAR(Vars::Misc::AccurateMovement);
 			LOAD_VAR(Vars::Misc::InfiniteEatKey);
 			LOAD_VAR(Vars::Misc::DirectionalOnlyOnMove);
@@ -881,9 +878,6 @@ bool CConfigManager::LoadConfig(const std::string& configName)
 			LOAD_VAR(Vars::Misc::PartyNetworking);
 			LOAD_VAR(Vars::Misc::PartyMarker);
 			LOAD_VAR(Vars::Misc::PartyESP);
-			LOAD_VAR(Vars::Misc::CrouchSpeed);
-			LOAD_VAR(Vars::Misc::FastAccel);
-			LOAD_VAR(Vars::Misc::FakeAccelAngle);
 			LOAD_VAR(Vars::Misc::SoundBlock);
 			LOAD_VAR(Vars::Misc::ChatFlags);
 			LOAD_VAR(Vars::Misc::MedievalChat);

@@ -17,10 +17,10 @@ void CMisc::RunPre(CUserCmd* pCmd, bool* pSendPacket)
 	{
 		FastStop(pCmd, pLocal);
 		StopMovement(pCmd, pSendPacket);
-		FastDeltaMove(pCmd, pSendPacket);
+		FastDeltaMove(pCmd, pSendPacket, pLocal);
 		//PrintProjAngles(pLocal);
 		AccurateMovement(pCmd, pLocal);
-		FastAccel(pCmd, pLocal, pSendPacket);
+		FastAccel(pCmd, pLocal);
 		AutoJump(pCmd, pLocal);
 		AutoStrafe(pCmd, pLocal);
 		NoiseMakerSpam(pLocal);
@@ -72,8 +72,8 @@ void CMisc::StopMovement(CUserCmd* pCmd, bool* pSendPacket)
 	*pSendPacket = false;
 }
 
-void CMisc::FastDeltaMove(CUserCmd* pCmd, bool* pSendPacket){
-	if (!Vars::Misc::FastDeltaStrafe.Value) { return; }
+void CMisc::FastDeltaMove(CUserCmd* pCmd, bool* pSendPacket, CBaseEntity* pLocal){
+	if (pLocal->IsInBumperKart() ? Vars::Misc::AltMovement.Value & 0 << 0 : Vars::Misc::AltMovement.Value & 0 << 3) { return; }
 
 	bool bChanged = false;
 
@@ -446,20 +446,17 @@ void CMisc::DuckJump(CBaseEntity* pLocal, CUserCmd* pCmd) {
 	pCmd->buttons |= IN_DUCK;
 }
 
-void CMisc::FastAccel(CUserCmd* pCmd, CBaseEntity* pLocal, bool* pSendPacket)
+void CMisc::FastAccel(CUserCmd* pCmd, CBaseEntity* pLocal)
 {
 	bFastAccel = false;
-	static bool flipVar = false;
-	flipVar = !flipVar;
 
-	if ((G::AAActive || bMovementScuffed || bMovementStopped) || (Vars::Misc::FakeAccelAngle.Value && !flipVar))
+	if ((G::AAActive || bMovementScuffed || bMovementStopped))
 	{
 		return;
 	}
 
-	const bool bShouldAccel = !G::ShouldShift && Vars::Misc::FastAccel.Value;
-	const bool bShouldAccelFinal = pLocal->IsDucking() ? Vars::Misc::CrouchSpeed.Value : bShouldAccel;
-	if (!bShouldAccelFinal)
+	const bool bShouldAccel = !G::ShouldShift && pLocal->IsInBumperKart() ? (Vars::Misc::AltMovement.Value & 1 << 0) : pLocal->IsDucking() ? (Vars::Misc::AltMovement.Value & 1 << 1) : (Vars::Misc::AltMovement.Value & 1 << 2);
+	if (!bShouldAccel)
 	{
 		return;
 	}
@@ -510,10 +507,6 @@ void CMisc::FastAccel(CUserCmd* pCmd, CBaseEntity* pLocal, bool* pSendPacket)
 		pCmd->viewangles.y = fmodf(pCmd->viewangles.y - angMoveReverse.y, 360.0f);	//	this doesn't have to be clamped inbetween 180 and -180 because the engine automatically fixes it.
 		pCmd->viewangles.z = 270.f;
 		G::UpdateView = false; bFastAccel = true;
-		if (Vars::Misc::FakeAccelAngle.Value)
-		{
-			*pSendPacket = false;
-		}
 	}
 }
 
