@@ -1,6 +1,6 @@
 - [[seowned]](https://github.com/Counter2828/SEOwnedPublic)
 - [[fedoraware]](https://github.com/Fedoraware/Fedoraware)
-- [[stax fork]](https://github.com/stax132349/Fedoraware)
+- [[Baan]](https://github.com/xxmyn/Fedoraware)
 
 Credits;
 - [spook953](https://github.com/spook953)
